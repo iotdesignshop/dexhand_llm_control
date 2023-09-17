@@ -10,6 +10,7 @@ default_message_stack = [
             mathematics and other things we may arrive upon in a conversation. \
             I will ask you some questions, and you figure out how to respond \
             using the hand as an output device if you can. \
+            The hand has five digits in total. Four fingers and one thumb. \
             The API that you will have access to is pretty simple. For each digit on the hand, \
             you will be able to set the extension of the digit from 0.0 to 1.0. \
             0.0 means the digit is fully retracted and curled in toward the palm. \

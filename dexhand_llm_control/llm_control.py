@@ -19,8 +19,9 @@ class LLMControlNode(Node):
             exit(1)
         self.openai_session = OpenAISession(openai_key, self.get_logger())
 
-        # Default publisher for hand 
-        self.publisher_ = self.create_publisher(String, '/dexhand_finger_extension', 10)
+        # Default publishers for hand 
+        self.extension_publisher = self.create_publisher(String, 'dexhand_finger_extension', 10)
+        self.gesture_publisher = self.create_publisher(String, 'dexhand_gesture', 10)
 
         # Set up speech recognition
         self.recognizer = sr.Recognizer()
@@ -30,14 +31,6 @@ class LLMControlNode(Node):
         self.audio_thread = threading.Thread(target=self.message_processing_loop)
         self.audio_thread.start()
         
- #   def read_from_serial(self):
- #       if self.serial_conn.in_waiting:
- #           response = self.serial_conn.readline().decode('utf-8').strip()
- #           self.get_logger().info('Received from Arduino: "%s"' % response)
- #           msg = String()
- #           msg.data = response
- #           self.publisher_.publish(msg)
-
     # Basic wrapper for Google Text to Speech. Takes a string, speaks it, and then deletes the file.
     def textToSpeech(self, text):
         tts = gTTS(text=text, lang='en')
@@ -47,11 +40,17 @@ class LLMControlNode(Node):
 
     # Takes the JSON response from OpenAI and formats it into a command for the hand
     def formatROSMessages(self, jsonmessage):
+
+        # Publish a dexhand_gesture message to return to base pose
+        msg = String()
+        msg.data = "reset"
+        self.gesture_publisher.publish(msg)
+
         # Convert each finger to a dexhand_finger_extension message and publish it
         for finger, value in jsonmessage.items():
             msg = String()
             msg.data = "{0}:{1}".format(finger, value)
-            self.publisher_.publish(msg)
+            self.extension_publisher.publish(msg)
 
             self._logger.debug("Published dexhand_finger_extension message: {0}".format(msg.data))
 
@@ -68,6 +67,26 @@ class LLMControlNode(Node):
                     # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
                     # instead of `r.recognize_google(audio)`
                     query = self.recognizer.recognize_google(audio)
+
+                    # We have a few special commands that we handle here without needing AI
+
+                    # Reset the hand
+                    if query == "reset hand":
+                        self.get_logger().info('Resetting hand')
+                        msg = String()
+                        msg.data = "reset"
+                        self.gesture_publisher.publish(msg)
+                        continue
+
+                    # Reset the context
+                    if query == "reset context":
+                        self.get_logger().info('Resetting context')
+                        self.openai_session.resetContext()
+                        msg = String()
+                        msg.data = "reset"
+                        self.gesture_publisher.publish(msg)
+                        
+                        continue
                     
                     # Send the query to OpenAI
                     jsonmessage,textmessage = self.openai_session.processPrompt(query)

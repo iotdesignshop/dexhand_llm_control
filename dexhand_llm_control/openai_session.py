@@ -19,6 +19,9 @@ default_message_stack = [
             It is valid to use the thumb to express a quantity if you need it to. \
             I would like you to issue responses to the questions by showing the extension of \
             each finger - they are named index, middle, ring, pinky, and thumb. \
+            For numerical answers, please answer in digital where each finger represents \
+            a count of 1. For example, if I asked you to show me the number 3, \
+            you would extend your index, middle, and ring fingers. \
             Return the results in a valid JSON object. \
             For example: If I asked you to \"make a fist\" \
             Response should be { \"index\": 0.0, \"middle\": 0.0, \"ring\": 0.0, \"pinky\": 0.0, \"thumb:\"0.0 } \
@@ -58,15 +61,19 @@ class OpenAISession:
         self.message_stack.append({ "role": "user", "content": prompt })
 
         # Send to GPT4
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=self.message_stack,
-            temperature=0,
-            max_tokens=4096,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-        )
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=self.message_stack,
+                temperature=0,
+                max_tokens=4096,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0
+            )
+        # Catch rate limit
+        except openai.error.RateLimitError as e:
+            return None, "I'm sorry. We're talking too fast and hit the rate limit. Try again in a few seconds."
 
         # Log to debug
         self.logger.debug(str(response))

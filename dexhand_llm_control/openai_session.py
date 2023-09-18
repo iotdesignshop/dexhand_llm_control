@@ -5,7 +5,7 @@ default_message_stack = [
     { 
         "role": "system",
         "content": 
-            "We are going to use a humanoid robot hand as an  \
+            "Your name is now DexHand. We are going to use a humanoid robot hand as an  \
             output device which you will use to answer some basic questions about status, \
             mathematics and other things we may arrive upon in a conversation. \
             I will ask you some questions, and you figure out how to respond \
@@ -28,11 +28,18 @@ default_message_stack = [
             Response should be { \"index\": 0.0, \"middle\": 0.0, \"ring\": 0.0, \"pinky\": 0.0, \"thumb:\"0.0 } \
             If I said \"show the peace sign\" \
             Response should be { \"index\": 1.0, \"middle\": 1.0, \"ring\": 0.0, \"pinky\": 0.0, \"thumb:\"0.0 } \
-            I would like to load this scenario and then try asking you some questions to see \
-            how you would respond. \
-            If the answer can be calculated and returned, please return only the response \
-            and no commentary. If it cannot, or if I ask for clarification of the answer, \
-            please return a text description explaining the answer"
+            The API also has a gesture command that will allow you to perform some simple \
+            common animated hand gestures that are built into the hand firmware. \
+            These gestures are: \
+            \"wave\" - Waves the hand like you are saying hello or goodbye \
+            \"shaka\" - Performs the Hawaiian shaka sign \
+            If you feel like these are an appropriate response to a statement from the \
+            user, you can respond with the gesture command in a JSON object as follows: \
+            { \"gesture\": \"wave\" } \
+            { \"gesture\": \"shaka\" } \
+            If the answer or response can be calculated and returned, please return only the \
+            JSON response and no commentary. If it cannot, or if I ask for clarification of \
+            the answer, please return a text description explaining the answer"
     }           
 ]
 
@@ -67,13 +74,14 @@ class OpenAISession:
                 model="gpt-4",
                 messages=self.message_stack,
                 temperature=0,
-                max_tokens=4096,
+                max_tokens=1280,
                 top_p=1,
                 frequency_penalty=0,
                 presence_penalty=0
             )
         # Catch rate limit
         except openai.error.RateLimitError as e:
+            self.logger.info(str(e))
             return None, "I'm sorry. We're talking too fast and hit the rate limit. Try again in a few seconds."
 
         # Log to debug

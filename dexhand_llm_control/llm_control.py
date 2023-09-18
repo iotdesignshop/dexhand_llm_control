@@ -25,8 +25,20 @@ class LLMControlNode(Node):
 
         # Set up speech recognition
         self.recognizer = sr.Recognizer()
-        self.recognizer.energy_threshold = 6000
 
+        # List the microphones - see if we can find a Respeaker
+        self.microphone_index = 0   # Default to built in microphone
+        for index, name in enumerate(sr.Microphone.list_microphone_names()):
+            self.get_logger().debug("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+            if (name.lower().find("respeaker") != -1):
+                self.microphone_index = index
+                self.get_logger().info("Respeaker detected - Using microphone with name \"{1}\" for `Microphone(device_index={0})`".format(index, name))
+                break
+        self.microphone = sr.Microphone(device_index=self.microphone_index)
+        #self.recognizer.energy_threshold = 4000
+        with self.microphone as source:
+            self.recognizer.adjust_for_ambient_noise(self.microphone)
+        
         # Start audio processing loop in a thread
         self.audio_thread = threading.Thread(target=self.message_processing_loop)
         self.audio_thread.start()
@@ -46,19 +58,27 @@ class LLMControlNode(Node):
         msg.data = "reset"
         self.gesture_publisher.publish(msg)
 
-        # Convert each finger to a dexhand_finger_extension message and publish it
-        for finger, value in jsonmessage.items():
+        # Is this a gesture or a finger message?
+        if "gesture" in jsonmessage:
             msg = String()
-            msg.data = "{0}:{1}".format(finger, value)
-            self.extension_publisher.publish(msg)
+            msg.data = jsonmessage["gesture"]
+            self.gesture_publisher.publish(msg)
 
-            self._logger.debug("Published dexhand_finger_extension message: {0}".format(msg.data))
+            self._logger.debug("Published dexhand_gesture message: {0}".format(msg.data))
+        else:
+            # Convert each finger to a dexhand_finger_extension message and publish it
+            for finger, value in jsonmessage.items():
+                msg = String()
+                msg.data = "{0}:{1}".format(finger, value)
+                self.extension_publisher.publish(msg)
+
+                self._logger.debug("Published dexhand_finger_extension message: {0}".format(msg.data))
 
     # This is our main message processor that records audio from the user and 
     # attempts to process it with OpenAI. It runs in a thread.
     def message_processing_loop(self):
         while rclpy.ok():
-            with sr.Microphone() as source:
+            with self.microphone as source:
                 self.get_logger().info('Ready for audio input')
                 audio = self.recognizer.listen(source)
 

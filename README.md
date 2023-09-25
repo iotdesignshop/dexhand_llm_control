@@ -1,8 +1,7 @@
 # dexhand_llm_control
 A demonstration package for connecting the DexHand to GPT-4 via ROS 2. Check out our YouTube video below of the package in action!
-[<img width="361" alt="Watch On YouTube" src="https://github.com/iotdesignshop/dexhand_llm_control/assets/2821763/834e62f0-065b-4caa-a0cd-f984665a38ad">](https://youtu.be/GWHLRgOuJLU)
 
-
+[<img src="https://github.com/iotdesignshop/dexhand_llm_control/assets/2821763/834e62f0-065b-4caa-a0cd-f984665a38ad" width=300/>](https://youtu.be/GWHLRgOuJLU)
 
 ## What Does This Package Do?
 

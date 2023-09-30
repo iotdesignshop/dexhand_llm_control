@@ -1,7 +1,7 @@
 # dexhand_llm_control
 A demonstration package for connecting the DexHand to GPT-4 via ROS 2. Check out our YouTube video below of the package in action!
 
-[![DexHand LLM](https://markdown-videos-api.jorgenkh.no/url?url=https%3A%2F%2Fyoutu.be%2FGWHLRgOuJLU)](https://youtu.be/GWHLRgOuJLU)
+[![DexHand LLM](https://github.com/iotdesignshop/dexhand-mechanical-build/blob/main/docs/images/web-general/llm-vid-thumb.png?raw=true)](https://youtu.be/GWHLRgOuJLU)
 
 
 ## What Does This Package Do?
@@ -30,6 +30,15 @@ By default, the Speech Recognizer will default to the microphone available on th
 
 If it's detected on the most machine, the Respeaker will be used instead of the built-in mic. Otherwise, the system falls back to the default system audio input.
 
+## OpenAI API Key
+
+To run the node, you will need to set an environment variable containing your OpenAI API Key. If you don't already have a key, you can create an account at OpenAI and fund it on pay-per-use basis to get your key. It's not overly expensive to make calls to the OpenAI API, but you need to have this set up before you can access the API. Instructions can be found here - https://openai.com/blog/openai-api
+
+We use a little shell script to set up our API key:
+
+(Example script here)
+
+**IMPORTANT: Do not check your API key in to any public repositories or post in a manner that exposes it to GitHub or other Internet facing sites**
 
 ## ROS 2 Command Line
 

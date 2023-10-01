@@ -41,7 +41,16 @@ To run the node, you will need to set an environment variable containing your Op
 
 We use a little shell script to set up our API key:
 
-(Example script here)
+```
+export OPENAI_API_KEY={Paste Your Key Here}
+source install/setup.bash
+```
+We store this file as __setup_env.bash__ in the root of our ROS 2 workspace. That way, when you want to start working with the LLM package, you can just run:
+```
+source setup_env.bash
+```
+
+And have the OpenAI key set, as well as your ROS 2 environment ready
 
 **IMPORTANT: Do not check your API key in to any public repositories or post in a manner that exposes it to GitHub or other Internet facing sites**
 

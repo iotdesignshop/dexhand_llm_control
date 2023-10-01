@@ -10,6 +10,10 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
 
+  <exec_depend>dexhand_gesture_controller</exec_depend>
+  <exec_depend>dexhand_usb_serial</exec_depend>
+  <exec_depend>dexhand_description</exec_depend>
+
   <exec_depend>portaudio19-dev</exec_depend>
   <exec_depend>mpg123</exec_depend>
   <exec_depend>python-speechrecognition-pip</exec_depend> 

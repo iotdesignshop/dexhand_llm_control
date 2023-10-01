@@ -27,13 +27,15 @@ class LLMControlNode(Node):
         self.recognizer = sr.Recognizer()
 
         # List the microphones - see if we can find a Respeaker
-        self.microphone_index = 0   # Default to built in microphone
+        self.microphone_index = 0  # Default to built in microphone
         for index, name in enumerate(sr.Microphone.list_microphone_names()):
             self.get_logger().debug("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
             if (name.lower().find("respeaker") != -1):
                 self.microphone_index = index
                 self.get_logger().info("Respeaker detected - Using microphone with name \"{1}\" for `Microphone(device_index={0})`".format(index, name))
                 break
+
+        self.get_logger().info("Using microphone with index {0} named {1}".format(self.microphone_index, sr.Microphone.list_microphone_names()[self.microphone_index]))
         self.microphone = sr.Microphone(device_index=self.microphone_index)
         #self.recognizer.energy_threshold = 4000
         with self.microphone as source:

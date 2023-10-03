@@ -8,6 +8,9 @@ Check out our YouTube video below of the package in action!
 
 [![DexHand LLM](https://github.com/iotdesignshop/dexhand-mechanical-build/blob/main/docs/images/web-general/llm-vid-thumb.png?raw=true)](https://youtu.be/GWHLRgOuJLU)
 
+## Acknowledgements
+
+We'd like to give a shout out to Ren Silve and his work on the [openai-converse project](https://github.com/RenSilvaAU/openai-converse) as it was the initial inspiration for the idea that ChatGPT could drive a robot as an output device! Thanks for getting the ball rolling on this!
 
 ## What Does This Package Do?
 

@@ -37,7 +37,7 @@ class LLMControlNode(Node):
 
         self.get_logger().info("Using microphone with index {0} named {1}".format(self.microphone_index, sr.Microphone.list_microphone_names()[self.microphone_index]))
         self.microphone = sr.Microphone(device_index=self.microphone_index)
-        #self.recognizer.energy_threshold = 4000
+        self.recognizer.energy_threshold = 4000
         with self.microphone as source:
             self.recognizer.adjust_for_ambient_noise(self.microphone)
         

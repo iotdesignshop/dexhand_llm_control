@@ -8,6 +8,9 @@ import threading
 from dexhand_llm_control.openai_session import OpenAISession
 import json
 
+import sounddevice
+
+
 class LLMControlNode(Node):
     def __init__(self):
         super().__init__('llm_control')
@@ -36,14 +39,21 @@ class LLMControlNode(Node):
                 break
 
         self.get_logger().info("Using microphone with index {0} named {1}".format(self.microphone_index, sr.Microphone.list_microphone_names()[self.microphone_index]))
-        self.microphone = sr.Microphone(device_index=self.microphone_index)
-        self.recognizer.energy_threshold = 4000
-        with self.microphone as source:
-            self.recognizer.adjust_for_ambient_noise(self.microphone)
         
-        # Start audio processing loop in a thread
-        self.audio_thread = threading.Thread(target=self.message_processing_loop)
-        self.audio_thread.start()
+        try:
+            self.microphone = sr.Microphone(device_index=self.microphone_index)
+            self.recognizer.energy_threshold = 4000
+            with self.microphone as source:
+                self.recognizer.adjust_for_ambient_noise(self.microphone)
+        
+            # Start audio processing loop in a thread
+            self.audio_thread = threading.Thread(target=self.message_processing_loop)
+            self.audio_thread.start()
+        except Exception as e:
+            self.get_logger().error("Error initializing microphone: {0}".format(self.microphone_index))
+            self.get_logger().error("No input device available. Exiting dexhand_llm_control.")
+            exit(1)
+
         
     # Basic wrapper for Google Text to Speech. Takes a string, speaks it, and then deletes the file.
     def textToSpeech(self, text):

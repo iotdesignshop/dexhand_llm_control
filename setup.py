@@ -14,7 +14,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),    
     ],
-    install_requires=['setuptools','gtts','openai','pyaudio','SpeechRecognition','openai_session'],
+    install_requires=['setuptools','gtts','openai','pyaudio','SpeechRecognition','openai_session', 'sounddevice'],
     zip_safe=True,
     maintainer='Trent Shumay',
     maintainer_email='trent@iotdesignshop.com',

@@ -1,4 +1,6 @@
 import openai
+from openai import OpenAI
+
 
 # This is our default prompt used whenever a session is started or reset
 default_message_stack = [
@@ -48,11 +50,11 @@ default_message_stack = [
 class OpenAISession:
 
     def __init__(self, key, logger):
-        
+
         self.logger = logger
 
         # Set the OpenAI key
-        openai.api_key = key
+        self.client = OpenAI(api_key=key)
 
         # Start with a clean prompt
         self.resetPrompt()
@@ -70,17 +72,15 @@ class OpenAISession:
 
         # Send to GPT4
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=self.message_stack,
-                temperature=0,
-                max_tokens=1280,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-            )
+            response = self.client.chat.completions.create(model="gpt-4",
+            messages=self.message_stack,
+            temperature=0,
+            max_tokens=1280,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0)
         # Catch rate limit
-        except openai.error.RateLimitError as e:
+        except openai.RateLimitError as e:
             self.logger.info(str(e))
             return None, "I'm sorry. We're talking too fast and hit the rate limit. Try again in a few seconds."
 
@@ -88,8 +88,8 @@ class OpenAISession:
         self.logger.debug(str(response))
 
         # Extract response message
-        message = response['choices'][0]['message']['content']
-        
+        message = response.choices[0].message.content
+
         # Push the response to the message stack
         self.message_stack.append({ "role": "assistant", "content": message })
 
@@ -114,6 +114,6 @@ class OpenAISession:
                 textmessage = message
         else:
             textmessage = None
-        
+
         return jsonmessage, textmessage
 
